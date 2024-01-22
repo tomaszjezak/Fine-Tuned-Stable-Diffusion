@@ -15,4 +15,5 @@ _site
 *.out
 *.synctex.gz
 _latex/
+.vscode/*
 
