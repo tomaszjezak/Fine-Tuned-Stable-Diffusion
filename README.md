@@ -8,6 +8,7 @@ Project page: https://ucladeepvision.github.io/CS188-Projects-2024Winter/
 1. Follow the first 2 steps in [pull-request-instruction](pull-request-instruction.md)
 
 2. Installing Ruby with version 3.1.4 
+
 For MacOS:
 ```
 brew install rbenv ruby-build
