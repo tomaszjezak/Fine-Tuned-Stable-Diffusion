@@ -57,9 +57,9 @@ We will use git pull request to manage submissions.
 
 Once you've done, follow steps 3 and 4 in [pull-request-instruction](pull-request-instruction.md) to make a pull request BEFORE the deadline. Please make sure not to modify any file except your .md file and your images folder. We will merge the request after all submissions are received, and you should able to check your work in the project page on next week of each deadline.
 
-## Deadlines
-You should make one pull request of your final project 
-March 17 (Tentative). Update your final blog post by making a pull request
+## Deadlines  
+You should update your final blog post by making a pull request on March 17. 
+
 -----
 
 Kudos to [Tianpei](https://gutianpei.github.io/), who originally developed this site for CS 188 in Winter 2022.
