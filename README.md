@@ -58,7 +58,7 @@ We will use git pull request to manage submissions.
 Once you've done, follow steps 3 and 4 in [pull-request-instruction](pull-request-instruction.md) to make a pull request BEFORE the deadline. Please make sure not to modify any file except your .md file and your images folder. We will merge the request after all submissions are received, and you should able to check your work in the project page on next week of each deadline.
 
 ## Deadlines  
-You should update your final blog post by making a pull request on March 17. 
+You should update your final blog post by making a pull request on March 22. 
 
 -----
 
