@@ -67,4 +67,32 @@ Please make sure to cite properly in your work, for example:
 
 ## Introduction
 
+Our project is about DreamBooth.
+
+## Traning Script
+
+Now that you have an idea of how the DreamBooth traning method works, let's dive into an example of how it is utilized in practice.
+
+The de-facto standard for anything related to diffusions is the python library [diffusers](https://huggingface.co/docs/diffusers/en/index) created by Hugging Face. It provides primatives and pretrained diffusion models for use accross several domains like image and audio generation.
+
+In this case we used their `train_dreambooth` script in combination with their pretrained Stable Diffusion model to run our experiments.
+
+### Script overview
+
+This is how the script works.
+
+## Results
+
+Overall we attempted to generate images of our faces by using DreamBooth to fine-tune both Stable Diffusion and Stable Diffusion XL.
+
+### Stable Diffusion
+
+![Rory in the desert]({{ '/assets/images/team39/camels.png' | relative_url }})
+
+### Stable Diffusion XL
+
+
+### Hyperparams
+### Different Training Datasets
+
 ---
