@@ -6,16 +6,16 @@ author: Rory Hemmings, Brody Jones, Tomasz Jezak, Hank Lin
 date: 2024-03-20
 ---
 
-## Abstract
-
-We address the limitations of stable diffusion models in generating images of specific subjects and environments by applying a state-of-the-art fine-tuning method known as DreamBooth, which enables the model to recognize and generate specific subjects or styles. We proceed with two main objectives: to assess DreamBooth's effectiveness in creating images with faces, and to evaluate its capability in accurately replicating custom environments across multiple diffusions -- a novel exploration since DreamBooth has predominantly focused on replicating specific objects. We conducted experiments using datasets specifically curated for these tasks, fine-tuning the Stable Diffusion and Stable Diffusion XL models in conjunction with DreamBooth. The results demonstrate a significant improvement in the model's ability to produce detailed and contextually appropriate images, showcasing DreamBooth's potential in enhancing the specificity and relevance of generated images. This research contributes to the field of generative artificial intelligence by providing insights into methods for personalizing text-to-image models, with implications for advancing content creation in various creative industries.
-
+> Stable diffusion is an extremely powerful text-to-image model, however it struggles with generating images of specific subjects. We decided to address this by exploring a state of the art finetuing method known as DreamBooth to evaluate it's ability to create images with custom faces as well as its ability to replicate custom environments.
 
 <!--more-->
 {: class="table-of-content"}
 * TOC
 {:toc}
 
+## Abstract
+
+We address the limitations of stable diffusion models in generating images of specific subjects and environments by applying a state-of-the-art fine-tuning method known as DreamBooth, which enables the model to recognize and generate specific subjects or styles. We proceed with two main objectives: to assess DreamBooth's effectiveness in creating images with faces, and to evaluate its capability in accurately replicating custom environments across multiple diffusions -- a novel exploration since DreamBooth has predominantly focused on replicating specific objects. We conducted experiments using datasets specifically curated for these tasks, fine-tuning the Stable Diffusion and Stable Diffusion XL models in conjunction with DreamBooth. The results demonstrate a significant improvement in the model's ability to produce detailed and contextually appropriate images, showcasing DreamBooth's potential in enhancing the specificity and relevance of generated images. This research contributes to the field of generative artificial intelligence by providing insights into methods for personalizing text-to-image models, with implications for advancing content creation in various creative industries.
 
 
 ## How Diffusion Works
@@ -31,13 +31,15 @@ The reverse process is where the actual learning and image creation take place. 
 Stable Diffusion is an important step forward for diffusion models.  It was published to be a more robust, lightweight, accessible form of diffusion.  The main change was performing the noising/denoising process in the latent space, as opposed to the image space.  In the following sections we will detail the variational autoencoders, backbones, and tokenizers used to facilitate this latent diffusion process.  It is built to be open source, accessible, and easy to use on consumer grade graphics cards.  Downloading the pretrained model allows you to generate images in a matter of minutes, while maintaining control over hyperparameters.  The lightweight model works because image features are preserved in the latent space, and fine details can be painted in post-diffusion by variational autoencoders.
 
 ## Autoencoders
-Autoencoders are key to the process of dimensionality reduction in stable diffusion.  By compressing data into the latent space, and reducing the number of features describing the input, it lets our diffusion model easily manipulate, select, and extract information from the original dataset.  Comprised of an encoder and a decoder, the autoencoder compresses a 512x512 pixel image down to a 64x64 model in the latent, where diffusion is performed, before the decoder reconstructs a pixel image of the same size as the input.  This process typically results in data loss during the decoding process.  Our aim for an efficient autoencoder model is to optimize the encoder/decoder pair to preserve maximal information during compression, and to decode with minimal information loss.  We can calculate loss on the AE by observing the difference between an input image $x$ and the image $\bar{x}$ which is the pixel image created by running the encoder on $x$ and then the decoder on the resulting latent model.  The loss function to represent this is as follows $|x - \bar{x}|_2 = |x - d(e(x))|_2$. This loss is used for gradient descent and backpropagation to optimize the autoencoder.
+Autoencoders are key to the process of dimensionality reduction in stable diffusion.  By compressing data into the latent space, and reducing the number of features describing the input, it lets our diffusion model easily manipulate, select, and extract information from the original dataset.  Comprised of an encoder and a decoder, the autoencoder compresses a 512x512 pixel image down to a 64x64 model in the latent, where diffusion is performed, before the decoder reconstructs a pixel image of the same size as the input.  This process typically results in data loss during the decoding process.  Our aim for an efficient autoencoder model is to optimize the encoder/decoder pair to preserve maximal information during compression, and to decode with minimal information loss.  We can calculate loss on the AE by observing the difference between an input image $$x$$ and the image $$\bar{x}$$ which is the pixel image created by running the encoder on $$x$$ and then the decoder on the resulting latent model.  The loss function to represent this is as follows $$|x - \bar{x}|_2 = |x - d(e(x))|_2$$. This loss is used for gradient descent and backpropagation to optimize the autoencoder.
 
 ## VAEs
 Variational autoencoders (VAEs) improve on standard autoencoders by introducing probabilistic modeling into the encoding process. VAEs use neural network architectures for unsupervised learning of a probabilistic distribution in the latent space. This enables more effective sampling and interpolation between data points. VAEs can generate more diverse and realistic outputs than traditional autoencoders, while also providing a structured and continuous latent space representation. Additionally, they offer a more robust framework for regularization and control over the latent space, facilitating better disentanglement of underlying factors in the data. In general, VAEs provide a more versatile and powerful framework for tasks such as image generation, data generation, and representation learning.
 
 ## UNet Backbones
-UNet backbones are the most commonly used backbone architectures, and they are crucial to the diffusion process.  UNets, also aptly called Noise Predictors, provide the essential ability to predict the amount of noise in an image $x_t$, given that image and its corresponding time step $t$. This information is used during denoising in the reverse pass of stable diffusion.  The UNet is a convolutional neural network that consists of downsampling followed by upsampling, with a series of long skip connects (LSCs) as shown in the image.  
+UNet backbones are the most commonly used backbone architectures, and they are crucial to the diffusion process.  UNets, also aptly called Noise Predictors, provide the essential ability to predict the amount of noise in an image $$x_t$$, given that image and its corresponding time step $$t$$. This information is used during denoising in the reverse pass of stable diffusion.  The UNet is a convolutional neural network that consists of downsampling followed by upsampling, with a series of long skip connects (LSCs) as shown in the image.  
+
+![unet]({{ '/assets/images/team39/unet.png' | relative_url }})
 
 This structure optimizes a few things.  First the downsampling/upsampling process fuses image features together to form a denser, more informative feature map.  The LSCs help the model to aggregate long distance information, and address the vanishing gradient problem.  The UNet backbone can now recognize both local and global features effectively, and does a good job of preserving spatial information.  They are computationally efficient, and robust to variations in the input.  All of these advantages make the UNet architecture the premier noise predictor in diffusion models. 
 
@@ -54,16 +56,19 @@ In addressing the nuances of few-shot learning, the focus is on refining text-to
 ### Reconstruction Loss
 To understand the new method the author proposed, we need to understand how the original loss function works for diffusion models: 
 
-$$\mathbb E_{x, c, \epsilon, t}[w_t || \hat x_\theta (\alpha _t x + \sigma_t\epsilon, c) - x ||^2_2] $$
-where $x$ is the ground-truth image, $x_{\theta}$ is the output image, $c$ is a conditioning vector, which is a text prompt in this case. $\epsilon$ is the noise we add to the image with normal distribution. $\alpha_t, \sigma_t, w_t$ are terms for noise scheduling and sample quality, with time step $t$.
+$$\mathbb E_{x, c, \epsilon, t}[w_t || \hat x_\theta (\alpha _t x + \sigma_t\epsilon, c) - x ||^2_2]$$
+
+where $$x$$ is the ground-truth image, $$x_{\theta}$$ is the output image, $$c$$ is a conditioning vector, which is a text prompt in this case. $$\epsilon$$ is the noise we add to the image with normal distribution. $$\alpha_t, \sigma_t, w_t$$ are terms for noise scheduling and sample quality, with time step $$t$$.
 
 ### Rare Unique Identifier Token
 The author introduced a new approach by implanting a new **unique identifier token** into the model's "dictionary", with a format of:  “a \[identifier\] \[class noun\]”, where \[identifier\] is a unique identifier linked to the subject and \[class noun\] is the class that you want to associate with. 
 
 ### Autogenous Class-specific Prior Preservation Loss
 Now we can add the prior-preservation term to the previous loss. It becomes
+
 $$\mathbb E_{x, c, \epsilon, t}[w_t || \hat x_\theta (\alpha _t x + \sigma_t\epsilon, c) - x ||^2_2  + \lambda w_t'||\hat x_\theta (\alpha' _t x_{pr} + \sigma_t'\epsilon', c_{pr}) - x_{pr} ||^2_2] $$
-where $x_{pr}$ is the image generated by the frozen model, $c_{pr}$ is the text prompt without the rare token. $\lambda$ is used to give the second term a weight, and the author set it to one.
+
+where $$x_{pr}$$ is the image generated by the frozen model, $$c_{pr}$$ is the text prompt without the rare token. $$\lambda$$ is used to give the second term a weight, and the author set it to one.
 
 ## Pipeline
 With the new loss function and the unique identifier, we can start fine tuning the model. Firstly, we give the model the specific type of image that we want the model to fine-tune on as input, then prompt the (yellow) model with the format mentioned above including the rare token to train it. This part is to link the model with the type of image we want, and it's supervised by the reconstruction loss. 
@@ -72,12 +77,7 @@ Secondly, we take an off-the-shelf text to image model(the red one) to generate 
 
 The integration of the autogenous class-specific prior preservation loss and the unique identifier in the fine-tuning process significantly enhances few-shot image generation. This method not only ensures detailed and accurate image generation but also safeguards the model's ability to produce diverse instances within a given class, maintaining a delicate balance between specificity and generality.
 
-
-
-
-
-
-
+![Dreambooth]({{ '/assets/images/team39/dreambooth.png' | relative_url }})
 
 ## Novel Implementation
 
@@ -357,18 +357,27 @@ While using a slightly different script, to fine-tune Stable Diffusion XL we end
 
 Here are the results using the same prompts as before along with the following additional prompts.
 1. Rory Fighting a dragon
-1. A drawing of Rory's face done in pencil
+2. A drawing of Rory's face done in pencil
 
 ![Rory Faces SDXL]({{ '/assets/images/team39/sdxl_face.png' | relative_url }})
+*Images with Rory's face generated using SDXL*
 
 ![Blade Runner SDXL]({{ '/assets/images/team39/sdxl_br.png' | relative_url }})
+*Blade Runner Images generated using SDXL*
 
-For SDXL, we also decided to train on a movie from an additional scene given how good the results were from Blade Runner. For this we used the following images from Star Wars.
+For SDXL, we also decided to train on a movie from an additional scene given how good the results were from Blade Runner. For this we used the following images from Star Wars in order to train.
 
 ![Dataset 3]({{ '/assets/images/team39/train_sw.png' | relative_url }})
+*Training images used for Star Wars environment*
+
+Given these training images, here are the results on the following prompts:
+1. A car on Tatooine
+2. A dog on Tatooine
 
 Here are the results:
+
 ![Star Wars Images]({{ '/assets/images/team39/sdxl_sw.png' | relative_url }})
+*Images on Tatooine generated using SDXL*
 
 Overall, the SDXL results were pretty amazing. It clearly outperformed Stable Diffusion with much higher quality images. Additionally, it seemed to have a much better understanding of faces given that it was able to reproduce the training face in different orientations and styles. It also had a deep understanding of the style established in the Blade Runner scene. It was even able to infer that the scene was set in the future by putting a futuristic looking car in the images without any sort of direction provided in the prompt or training images.
 
