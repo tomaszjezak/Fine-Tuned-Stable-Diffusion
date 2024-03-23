@@ -2,11 +2,11 @@
 layout: post
 comments: true
 title: Fine-tuning Stable Diffusion with Dreambooth
-author: Rory Hemmings, Brody Jones, Tomasz Jezak, Hank Lin
+author: Rory Hemmings, Tomasz Jezak, Brody Jones, Hank Lin
 date: 2024-03-20
 ---
 
-> Stable diffusion is an extremely powerful text-to-image model, however it struggles with generating images of specific subjects. We decided to address this by exploring a state of the art finetuing method known as DreamBooth to evaluate it's ability to create images with custom faces as well as its ability to replicate custom environments.
+> Stable diffusion is an extremely powerful text-to-image model, however it struggles with generating images of specific subjects. We decided to address this by exploring the state-of-the-art fine-tuning method DreamBooth to evaluate its ability to create images with custom faces, as well as its ability to replicate custom environments.
 
 <!--more-->
 {: class="table-of-content"}
@@ -28,7 +28,7 @@ The model is first trained by applying a diffusion process to an image, which ad
 The reverse process is where the actual learning and image creation take place. Essentially, the model iteratively predicts and removes the noise added during the forward process, attempting to reconstruct the original input image. The process begins with a sample of pure noise, with no recognizable structure or content related to the desired output image. At each step, the model, which has been trained on many examples of partially noised images and their corresponding noise patterns, tries to predict the exact noise that was added to the image at the corresponding step of the forward process. The model therefore makes an educated guess about how much of the current image’s content is noise versus signal (the underlying image structure). Once the model makes its prediction about the noise, this predicted noise is subtracted from the current image. This step is denoising, where the model effectively reverses one step of the forward process through removing the estimated noise. This process is repeated iteratively, as the model works its way back through the noise levels added during the forward process. With each step, the image becomes less noisy and more structured, gradually revealing the content and structure that the model has learned to generate. In conditional diffusion models, used for text-to-image generation, the denoising process is also conditioned on text descriptions, guiding the denoising to ensure the output image aligns with the given condition. The final output of the reverse process is a fully-denoised image, with a structure and clear image that was not apparent in the pure noise sample. The model is trained by exposing it to many examples of images at various stages of the forward (noising) process, alongside exactly how much noise was added at each step. Thus, the model learns the characteristics of the noise and how to properly remove it.
 
 ## Stable Diffusion
-Stable Diffusion is an important step forward for diffusion models.  It was published to be a more robust, lightweight, accessible form of diffusion.  The main change was performing the noising/denoising process in the latent space, as opposed to the image space.  In the following sections we will detail the variational autoencoders, backbones, and tokenizers used to facilitate this latent diffusion process.  It is built to be open source, accessible, and easy to use on consumer grade graphics cards.  Downloading the pretrained model allows you to generate images in a matter of minutes, while maintaining control over hyperparameters.  The lightweight model works because image features are preserved in the latent space, and fine details can be painted in post-diffusion by variational autoencoders.
+Stable Diffusion is an important step forward for diffusion models.  It was published to be a more robust, lightweight, accessible form of diffusion.  The main change was performing the noising/denoising process in the latent space, as opposed to the image space [2].  In the following sections we will detail the variational autoencoders, backbones, and tokenizers used to facilitate this latent diffusion process.  It is built to be open source, accessible, and easy to use on consumer grade graphics cards.  Downloading the pretrained model allows you to generate images in a matter of minutes, while maintaining control over hyperparameters.  The lightweight model works because image features are preserved in the latent space, and fine details can be painted in post-diffusion by variational autoencoders.
 
 ## Autoencoders
 Autoencoders are key to the process of dimensionality reduction in stable diffusion.  By compressing data into the latent space, and reducing the number of features describing the input, it lets our diffusion model easily manipulate, select, and extract information from the original dataset.  Comprised of an encoder and a decoder, the autoencoder compresses a 512x512 pixel image down to a 64x64 model in the latent, where diffusion is performed, before the decoder reconstructs a pixel image of the same size as the input.  This process typically results in data loss during the decoding process.  Our aim for an efficient autoencoder model is to optimize the encoder/decoder pair to preserve maximal information during compression, and to decode with minimal information loss.  We can calculate loss on the AE by observing the difference between an input image $$x$$ and the image $$\bar{x}$$ which is the pixel image created by running the encoder on $$x$$ and then the decoder on the resulting latent model.  The loss function to represent this is as follows $$|x - \bar{x}|_2 = |x - d(e(x))|_2$$. This loss is used for gradient descent and backpropagation to optimize the autoencoder.
@@ -47,11 +47,11 @@ This structure optimizes a few things.  First the downsampling/upsampling proces
 For a text-to-image generative model like the one we are implementing, we must condition the model based on the input text.  The tokenizer aims to construct a model input of up to 75 unique tokens from the given text.  Each word the tokenizer reads is wrapped into a 768-value vector token, containing embedded data about the input.  The CLIP model is pre-trained on SOTA image captioning datasets, so it can be called efficiently within stable diffusion models.  Newer CLIP models analyze subsections of the input text instead of a single word at a time, taking the context of each word into account allows these tokenizers to perform better in testing.  The output tokens are passed as an input to the UNet backbone in order to perform noise prediction.
 
 ## Stable Diffusion XL
-Recently, Stability AI published an even powerful stable diffusion model called Stable Diffusion XL (SDXL).  SDXL improves on many parts of stable diffusion, most noticeable in its capabilities to generate highly photorealistic, finer quality images.  It requires significantly more compute power than the older models, with over 3.5 billion learnable parameters (3x more than any prior stable diffusion model).  This model takes in 1024x1024 px images, has a larger UNet backbone, and operates in a larger latent space.  All of this allows SDXL to cover a wider range of visual styles, along with generating more accurate faces, hands, and legible text.  These fine grained capabilities are appealing to many fields in CV, thus the heavier model has become popular, even amongst longer training times and more required computation.
+Recently, Stability AI published an even more powerful stable diffusion model called Stable Diffusion XL (SDXL).  SDXL improves on many parts of stable diffusion, most noticeable in its capabilities to generate highly photorealistic, finer quality images [3].  It requires significantly more compute power than the older models, with over 3.5 billion learnable parameters (3x more than any prior stable diffusion model).  This model takes in 1024x1024 px images, has a larger UNet backbone, and operates in a larger latent space.  All of this allows SDXL to cover a wider range of visual styles, along with generating more accurate faces, hands, and legible text.  These fine grained capabilities are appealing to many fields in CV, thus the heavier model has become popular, even amongst longer training times and more required computation.
 
 
 ## DreamBooth Internal 
-In addressing the nuances of few-shot learning, the focus is on refining text-to-image diffusion models to prevent overfitting and retain a diverse knowledge base. To overcome these bottlenecks, the author proposed a new loss function, Class-specific Prior Preservation Loss to supervise the model more effectively.
+In addressing the nuances of few-shot learning, the focus is on refining text-to-image diffusion models to prevent overfitting and retain a diverse knowledge base. To overcome these bottlenecks, the author proposed a new loss function, Class-specific Prior Preservation Loss to supervise the model more effectively [4].
 
 ### Reconstruction Loss
 To understand the new method the author proposed, we need to understand how the original loss function works for diffusion models: 
@@ -73,7 +73,7 @@ where $$x_{pr}$$ is the image generated by the frozen model, $$c_{pr}$$ is the t
 ## Pipeline
 With the new loss function and the unique identifier, we can start fine tuning the model. Firstly, we give the model the specific type of image that we want the model to fine-tune on as input, then prompt the (yellow) model with the format mentioned above including the rare token to train it. This part is to link the model with the type of image we want, and it's supervised by the reconstruction loss. 
 
-Secondly, we take an off-the-shelf text to image model(the red one) to generate images with the usual text prompt "a \[class noun \]". Compare the output of the red model with the yellow one. This part ensures the new model is grounded with the existing knowledge with the class. Combined with the first part, we supervise this task with the autogenous class-specific prior preservation loss.
+Secondly, we take an off-the-shelf text to image model(the red one) to generate images with the usual text prompt "a \[class noun\]". Compare the output of the red model with the yellow one. This part ensures the new model is grounded with the existing knowledge with the class. Combined with the first part, we supervise this task with the autogenous class-specific prior preservation loss.
 
 The integration of the autogenous class-specific prior preservation loss and the unique identifier in the fine-tuning process significantly enhances few-shot image generation. This method not only ensures detailed and accurate image generation but also safeguards the model's ability to produce diverse instances within a given class, maintaining a delicate balance between specificity and generality.
 
@@ -204,7 +204,7 @@ if vae is not None:
     model_input = model_input * vae.config.scaling_factor
 ```
 
-For each of these images, it samples gaussian noise and adds it to the images in the batch at a random timestep according to the noise schedule.
+For each of these images, it samples Gaussian noise and adds it to the images in the batch at a random timestep according to the noise schedule.
 ```py
 # Sample noise to add to the image
 noise = torch.randn_like(model_input) + 0.1 * torch.randn(
@@ -239,7 +239,7 @@ if unwrap_model(unet).config.in_channels == channels * 2:
     noisy_model_input = torch.cat([noisy_model_input, noisy_model_input], dim=1)
 ```
 
-Next is actually predicts the added noise using the pretrained U-net.
+Next, the model predicts the added noise using the pretrained U-net.
 ```py
 # Predict noise residual
 model_pred = unet(
@@ -247,7 +247,7 @@ model_pred = unet(
 )[0]
 ```
 
-Up until this points, these steps have been similar to raw Stable Diffusion, however where Dreambooth is unique is in how it calculates the losses. First it calculates the prior preservation loss to measure deviation from the models preconceived notions of the input prompt.
+Up until this points, these steps have been similar to raw Stable Diffusion, however where Dreambooth is unique is in how it calculates the losses. First it calculates the prior preservation loss to measure deviation from the model's preconceived notions of the input prompt.
 ```py
  # Prior Preservation Loss
 target = noise
@@ -259,7 +259,7 @@ if args.with_prior_preservation:
     prior_loss = F.mse_loss(model_pred_prior.float(), target_prior.float(), reduction="mean")
 ```
 
-Next it computes the reconstruction loss and combines it with the weighted prior preservation loss.
+Next, the model computes the reconstruction loss and combines it with the weighted prior preservation loss.
 ```py
 # Compute Instance Reconstruction loss
 loss = F.mse_loss(model_pred.float(), target.float(), reduction="mean")
@@ -298,7 +298,7 @@ Overall we attempted to generate custom images using DreamBooth to fine-tune bot
 * Dataset 1: A face from same perspective in same environment (6 images)
 * Dataset 2: Frames from Blade Runner 2049 (5 images)
 
-The purpose of having these different datasets was to evaluate the models capability to replicate custom objects and different environments.
+The purpose of having these different datasets was to evaluate the model's capability to replicate custom objects and different environments.
 
 ### Training images
 
@@ -318,20 +318,20 @@ Here are the results for creating custom face images using the following prompts
 
 ![Face Images]({{ '/assets/images/team39/sd_face.png' | relative_url }})
 
-Here are the results from finetuning Stable Diffusion along with the Blade Runner images.
+Here are the results from fine-tuning Stable Diffusion along with the Blade Runner images.
 1. "A dog walking in a scene from Blade Runner"
 2. "A car in a scene from Blade Runner"
 3. "The mona lisa in a scene from Blade Runner"
 
 ![Blade Runner Images]({{ '/assets/images/team39/sd_br.png' | relative_url }})
 
-Overall the results were pretty good, but it's clear that the model had some difficulty understanding the details of my face. However it was astonishingly good at replicating the style and environment from just 4 images from once scene of a movie. While we knew that DreamBooth could replicate objects, the oringinal authors never tested it on environments. According to these results, it is clearly is capable of both.
+Overall, the results were good, but it's clear that the model had some difficulty understanding the details of Rory's face. However, it was astonishingly good at replicating the style and environment from just 4 images from one scene of a movie. While we knew that DreamBooth could replicate objects, the original authors never tested it on environments. According to these results, it clearly is capable of both.
 
 ### Stable Diffusion XL
 
 While the results from Stable Diffusion were pretty good, we wanted to experiment with Stable Diffusion XL to see if it would produce better quality images. Since Stable Diffusion XL is much larger, we expected better results, which turned out to be the case.
 
-While using a slightly different script, to fine-tune Stable Diffusion XL we ended up using pretty much the same hyperparameters except with a more aggressive learning rate of `1e-4` and `500` training steps. Something to note here is that we ended up using **lora** which allows us to save ram. This is particularly important as it significantly reduced training times and RAM usage, a critical step for SDXL because it is such a large model. Another thing to note is that we provide a third part VAE model, as the stock Stability AI one is known to be flakey. Given its unwieldy size, it ended up taking around 1 hour to train using a V100 GPU and the following command:
+While using a slightly different script to fine-tune Stable Diffusion XL, we ended up using similar hyperparameters, except with a more aggressive learning rate of `1e-4` and `500` training steps. Something to note here is that we ended up using **LoRA** which allows us to save ram. This is particularly important as it significantly reduced training times and RAM usage, a critical step for SDXL because it is such a large model. Another thing to note is that we provide a third-part VAE model, as the stock Stability AI one is known to be flakey. Given its unwieldy size, it ended up taking around 1 hour to train using a V100 GPU and the following command:
 
 ```
 # Stable Diffusion XL with LoRA
@@ -379,7 +379,7 @@ Here are the results:
 ![Star Wars Images]({{ '/assets/images/team39/sdxl_sw.png' | relative_url }})
 *Images on Tatooine generated using SDXL*
 
-Overall, the SDXL results were pretty amazing. It clearly outperformed Stable Diffusion with much higher quality images. Additionally, it seemed to have a much better understanding of faces given that it was able to reproduce the training face in different orientations and styles. It also had a deep understanding of the style established in the Blade Runner scene. It was even able to infer that the scene was set in the future by putting a futuristic looking car in the images without any sort of direction provided in the prompt or training images.
+Overall, the SDXL results were amazing. It clearly outperformed Stable Diffusion with much higher quality images. Additionally, it seemed to have a much better understanding of faces given that it was able to reproduce the training face in different orientations and styles. It also had a deep understanding of the style established in the Blade Runner scene. It was even able to infer that the scene was set in the future by putting a futuristic looking car in the images without any sort of direction provided in the prompt or training images.
 
 ## Conclusion
 
@@ -394,7 +394,7 @@ Our investigation invites several avenues for future work. Chief among these is 
 
 [2] Rombach, Robin, et al. "High-Resolution Image Synthesis with Latent Diffusion Models." arXiv preprint arXiv:2112.10752. 2021.
 
-[3] Podell, Dustin, et. al "SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis." arXiv preprint arXiv. Date of publication (if available).
+[3] Podell, Dustin, et. al "SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis." arXiv preprint arXiv2307.01952. 2023
 
 [4] Prafulla Dhariwal, Aditya Ramesh, et al. "DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation." arXiv preprint arXiv:2208.12242. 2022.
 
