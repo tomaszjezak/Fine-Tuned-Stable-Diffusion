@@ -13,8 +13,7 @@ date: 2024-03-20
 * TOC
 {:toc}
 
-## Abstract
-
+## Introduction
 We address the limitations of stable diffusion models in generating images of specific subjects and environments by applying a state-of-the-art fine-tuning method known as DreamBooth, which enables the model to recognize and generate specific subjects or styles. We proceed with two main objectives: to assess DreamBooth's effectiveness in creating images with faces, and to evaluate its capability in accurately replicating custom environments across multiple diffusions -- a novel exploration since DreamBooth has predominantly focused on replicating specific objects. We conducted experiments using datasets specifically curated for these tasks, fine-tuning the Stable Diffusion and Stable Diffusion XL models in conjunction with DreamBooth. The results demonstrate a significant improvement in the model's ability to produce detailed and contextually appropriate images, showcasing DreamBooth's potential in enhancing the specificity and relevance of generated images. This research contributes to the field of generative artificial intelligence by providing insights into methods for personalizing text-to-image models, with implications for advancing content creation in various creative industries.
 
 
@@ -317,6 +316,7 @@ Here are the results for creating custom face images using the following prompts
 2. "A photo of Rory holding a trophy in times square"
 
 ![Face Images]({{ '/assets/images/team39/sd_face.png' | relative_url }})
+*Images of custom faces generated using Finetuned Stable Diffusion*
 
 Here are the results from fine-tuning Stable Diffusion along with the Blade Runner images.
 1. "A dog walking in a scene from Blade Runner"
@@ -324,6 +324,7 @@ Here are the results from fine-tuning Stable Diffusion along with the Blade Runn
 3. "The mona lisa in a scene from Blade Runner"
 
 ![Blade Runner Images]({{ '/assets/images/team39/sd_br.png' | relative_url }})
+*Images of custom Blade Runner scene generated using Finetuned Stable Diffusion*
 
 Overall, the results were good, but it's clear that the model had some difficulty understanding the details of Rory's face. However, it was astonishingly good at replicating the style and environment from just 4 images from one scene of a movie. While we knew that DreamBooth could replicate objects, the original authors never tested it on environments. According to these results, it clearly is capable of both.
 
