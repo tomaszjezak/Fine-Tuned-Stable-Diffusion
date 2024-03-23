@@ -6,8 +6,9 @@ author: Rory Hemmings, Brody Jones, Tomasz Jezak, Hank Lin
 date: 2024-03-20
 ---
 
+## Abstract
 
-> Stable diffusion is an extremely powerful text-to-image model, however it struggles with generating images of specific subjects. We decided to address this by exploring a state of the art finetuing method known as DreamBooth to evaluate it's ability to create images with custom faces as well as its ability to replicate custom environments.
+We address the limitations of stable diffusion models in generating images of specific subjects and environments by applying a state-of-the-art fine-tuning method known as DreamBooth, which enables the model to recognize and generate specific subjects or styles. We proceed with two main objectives: to assess DreamBooth's effectiveness in creating images with faces, and to evaluate its capability in accurately replicating custom environments across multiple diffusions -- a novel exploration since DreamBooth has predominantly focused on replicating specific objects. We conducted experiments using datasets specifically curated for these tasks, fine-tuning the Stable Diffusion and Stable Diffusion XL models in conjunction with DreamBooth. The results demonstrate a significant improvement in the model's ability to produce detailed and contextually appropriate images, showcasing DreamBooth's potential in enhancing the specificity and relevance of generated images. This research contributes to the field of generative artificial intelligence by providing insights into methods for personalizing text-to-image models, with implications for advancing content creation in various creative industries.
 
 
 <!--more-->
@@ -15,8 +16,10 @@ date: 2024-03-20
 * TOC
 {:toc}
 
+
+
 ## How Diffusion Works
-Diffusion is a generative technique that can be used to create images by gradually transforming a distribution of random noise into a coherent image using a deep neural network. The process can be thought of as “denoising” and is based on the principles of diffusion processes observable in physical and biological systems.
+Diffusion is a generative technique that can be used to create images by gradually transforming a distribution of random noise into a coherent image using a deep neural network [1]. The process can be thought of as “denoising” and is based on the principles of diffusion processes observable in physical and biological systems.
 
 ## Diffusion: Forward Process
 The model is first trained by applying a diffusion process to an image, which adds Gaussian noise to the image over many steps (1,000 or so) until the image is complete noise. When adding Gaussian noise to an image, what is essentially occurring is the pixel values of the image are being modified by adding a small (or large, depending on the variance) random amount to each pixel. The randomness is guided by the Gaussian or Normal distribution, meaning most pixel changes will be small – close to the mean – but a few might be larger. Thus, the difference from Step i to Step i+1 is small, but over the 1,000 steps, the image becomes pure noise.
@@ -68,8 +71,6 @@ With the new loss function and the unique identifier, we can start fine tuning t
 Secondly, we take an off-the-shelf text to image model(the red one) to generate images with the usual text prompt "a \[class noun \]". Compare the output of the red model with the yellow one. This part ensures the new model is grounded with the existing knowledge with the class. Combined with the first part, we supervise this task with the autogenous class-specific prior preservation loss.
 
 The integration of the autogenous class-specific prior preservation loss and the unique identifier in the fine-tuning process significantly enhances few-shot image generation. This method not only ensures detailed and accurate image generation but also safeguards the model's ability to produce diverse instances within a given class, maintaining a delicate balance between specificity and generality.
-
-
 
 
 
@@ -373,11 +374,19 @@ Overall, the SDXL results were pretty amazing. It clearly outperformed Stable Di
 
 ## Conclusion
 
+In conclusion, our exploration into DreamBooth's application on stable diffusion models, specifically Stable Diffusion and Stable Diffusion XL, marks a significant stride towards addressing the challenge of generating highly specific and contextually relevant images. Through fine-tuning with DreamBooth, we have enhanced the models' abilities to create precise representations of faces and environments, showcasing the potential for more personalized and accurate image generation within the field of generative artificial intelligence.
+
+Our investigation invites several avenues for future work. Chief among these is the exploration of DreamBooth's scalability and application to a broader array of subjects and environments. Our work contributes to the advancement of text-to-image generation, opening up possibilities for content creation. Specifically, movie fan art is more feasible and accessible than ever, with artistic ability no longer being a barrier. Additionally, the ethical dilemma of producing highly-realistic images of copyrighted movies demands consideration, guiding potential research in the responsible development and use of these technologies. 
 
 
 ## Reference
-Please make sure to cite properly in your work, for example:
 
-[1] Redmon, Joseph, et al. "You only look once: Unified, real-time object detection." *Proceedings of the IEEE conference on computer vision and pattern recognition*. 2016.
+[1] Sohl-Dickstein, Jascha, et al. "Deep Unsupervised Learning using Nonequilibrium Thermodynamics." Proceedings of the 32nd International Conference on Machine Learning. 2015.
+
+[2] Rombach, Robin, et al. "High-Resolution Image Synthesis with Latent Diffusion Models." arXiv preprint arXiv:2112.10752. 2021.
+
+[3] Podell, Dustin, et. al "SDXL: Improving Latent Diffusion Models for High-Resolution Image Synthesis." arXiv preprint arXiv. Date of publication (if available).
+
+[4] Prafulla Dhariwal, Aditya Ramesh, et al. "DreamBooth: Fine Tuning Text-to-Image Diffusion Models for Subject-Driven Generation." arXiv preprint arXiv:2208.12242. 2022.
 
 ---
