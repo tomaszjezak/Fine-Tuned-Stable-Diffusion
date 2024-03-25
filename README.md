@@ -1,5 +1,5 @@
-### To read the report, please navigate to _posts --> 2024-03-20-team39-Finetuning-Stable-Diffusion.md
-# This page will be updated once the report is graded!
+# To read the report, please navigate to _posts --> 2024-03-20-team39-Finetuning-Stable-Diffusion.md
+### This page will be updated once the report is graded!
 
 # UCLA Deep Learning for Computer Vision Course Project
 
