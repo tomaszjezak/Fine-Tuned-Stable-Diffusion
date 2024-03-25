@@ -1,4 +1,4 @@
-# UCLA DLCV Course Project
+# UCLA Deep Learning for Computer Vision Course Project
 
 Project page: https://ucladeepvision.github.io/CS188-Projects-2024Winter/
 
